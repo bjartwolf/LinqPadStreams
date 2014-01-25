@@ -21,8 +21,8 @@ async void Main()
 	using (var app = WebApp.Start<Startup>(url: baseAddress))
 	{
 		HttpClient client = new HttpClient();
-		var res = client.GetAsync(baseAddress).Result;
-		File.WriteAllText(@"c:\data\linqpad2.html",res.Content.ReadAsStringAsync().Result);
+		var res = client.GetStringAsync(baseAddress).Result;
+		File.WriteAllText(@"c:\data\linqpad2.html",res);
 	}
 }
 	

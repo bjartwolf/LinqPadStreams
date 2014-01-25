@@ -21,13 +21,8 @@ async void Main()
 	using (var app = WebApp.Start<Startup>(url: baseAddress))
 	{
 		HttpClient client = new HttpClient();
-		var res = client.GetStreamAsync(baseAddress);
-		using (var fileStream = File.Create (@"c:\data\linqpad.html")) {
-		  await res.Result.CopyToAsync(fileStream);
-		}
-
-//		(await client.GetStreamAsync(baseAddress)).Dump();
-		//Console.ReadLine();
+		var res = client.GetAsync(baseAddress).Result;
+		File.WriteAllText(@"c:\data\linqpad2.html",res.Content.ReadAsStringAsync().Result);
 	}
 }
 	
@@ -37,12 +32,11 @@ public class FastController : ApiController
    public HttpResponseMessage GetResult()
    {
    "respdoing.ngd".Dump();
-   		//var fs = new FileStream(@"C:\data\hei.txt", FileMode.Open,FileAccess.Read);
    
-   	   var fs = new FileStream(@"C:\data\SwissProt.xml", FileMode.Open,FileAccess.Read);
+   	   var file = File.ReadAllText(@"C:\data\SwissProt.xml");
        var response = new HttpResponseMessage(HttpStatusCode.OK)
        {
-           Content = new StreamContent(fs)
+           Content = new StringContent(file)
        };
        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
        return response;

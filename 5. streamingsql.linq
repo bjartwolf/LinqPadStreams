@@ -1,4 +1,14 @@
 <Query Kind="Program">
+  <Connection>
+    <ID>edfd20db-1089-4a07-a303-3228930b5fe6</ID>
+    <Persist>true</Persist>
+    <Server>10.0.0.4</Server>
+    <SqlSecurity>true</SqlSecurity>
+    <UserName>streamlogin</UserName>
+    <Password>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA6i4CrwlEJ0KJNtf8jX3V1wAAAAACAAAAAAADZgAAwAAAABAAAAACNy+inxi1nkGQ7uJRF/pOAAAAAASAAACgAAAAEAAAAGJQgD36iOIxwtEpiQn9LdMIAAAANI4YzGhvZrMUAAAAeSIxnhcp3iJ09PtokR6smwbTEXY=</Password>
+    <Database>BinaryStream</Database>
+    <ShowServer>true</ShowServer>
+  </Connection>
   <Reference>&lt;RuntimeDirectory&gt;\System.Net.Http.dll</Reference>
   <NuGetReference>Microsoft.AspNet.WebApi.OwinSelfHost</NuGetReference>
   <Namespace>Microsoft.Owin.Hosting</Namespace>
@@ -22,10 +32,10 @@ async void Main()
 	{
 		HttpClient client = new HttpClient();
 		var res = client.GetStreamAsync(baseAddress);
-		using (var fileStream = File.Create (@"c:\data\linqpad.html")) {
-		  await res.Result.CopyToAsync(fileStream);
+		using (var fileStream = File.Create (@"c:\data\download.xml.gz")) {
+		   await res.Result.CopyToAsync(fileStream);
+		   Console.ReadLine();
 		}
-
 	}
 }
 	
@@ -36,7 +46,7 @@ public class FastController : ApiController
    {
             var con =
                new SqlConnection(
-                    "database=BinaryStream;server=10.0.0.4,1433;User Id=streamlogin; Password=str;Connection Timeout=300");
+					"database=BinaryStream;server=10.0.0.4,1433;User Id=streamlogin; Password=str;Connection Timeout=300");
             var cmd = new SqlCommand
             {
                 Connection = con,
@@ -47,13 +57,10 @@ public class FastController : ApiController
             SqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
             if (reader.Read())
             {
-                Stream stream = reader.GetStream(0);
-                var ms = new MemoryStream();
-                stream.CopyTo(ms);
-                ms.Position = 0;
+                var stream = reader.GetStream(0);
                 var response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StreamContent(ms)
+                    Content = new StreamContent(stream)
                 };
                 response.Content.Headers.ContentEncoding.Add("gzip");
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
